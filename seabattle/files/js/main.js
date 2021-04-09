@@ -52,6 +52,12 @@ function dragNDropShip() {
         let numberOfTd = parseInt(field.dataset.numberOfTd);
 
         if (element.classList.contains('ship-one')) {
+          if(field.classList.contains('dark-reserved')) {
+            shipToBack(element);
+
+            return;
+          }
+
           element.style.top = hField + 5 + 'px';
           if (numberOfTd > 1) {
             document.querySelector('#left table tbody tr[data-number-of-tr="' + numberOfTr + '"] td[data-number-of-td="' + (numberOfTd - 1) + '"]').classList.add('dark-reserved');
@@ -79,18 +85,28 @@ function dragNDropShip() {
             document.querySelector('#left table tbody tr[data-number-of-tr="' + (numberOfTr + 1) + '"] td[data-number-of-td="' + numberOfTd + '"]').classList.add('dark-reserved');
           }
         } else if (element.classList.contains('ship-two')) {
+          let next1field = document.querySelector('#left table tbody tr[data-number-of-tr="' + (numberOfTr + 1) + '"] td[data-number-of-td="' + numberOfTd + '"]');
+          if(next1field) {
+            next1field.classList.remove('dark');
+          }
+
+          if(field.classList.contains('dark-reserved')) {
+            shipToBack(element);
+
+            return;
+          }
+
           if (numberOfTr < 10) {
             element.style.top = hField + 2.5 + 'px';
 
-            let next1field = document.querySelector('#left table tbody tr[data-number-of-tr="' + (numberOfTr + 1) + '"] td[data-number-of-td="' + numberOfTd + '"]');
-            if(next1field) {
-              next1field.classList.remove('dark');
+            if(next1field && !next1field.classList.contains('dark-reserved')) {
               next1field.classList.add('dark-reserved');
+            } else {
+              shipToBack(element);
+              return;
             }
           } else {
-            element.style.position = 'inherit';
-            document.querySelector('#left .ships .two-ships').append(element);
-
+            shipToBack(element);
             return;
           }
 
@@ -136,19 +152,25 @@ function dragNDropShip() {
             next2field.classList.remove('dark');
           }
 
+          if(field.classList.contains('dark-reserved')) {
+            shipToBack(element);
+
+            return;
+          }
+
           if (numberOfTr < 9) {
+            if(next1field && !next1field.classList.contains('dark-reserved') &&
+                next2field && !next2field.classList.contains('dark-reserved')) {
+                  next1field.classList.add('dark-reserved');
+                  next2field.classList.add('dark-reserved');
+            } else {
+                  shipToBack(element);
+                  return;
+            }
+
             element.style.top = hField + 5 + 'px';
-
-            if(next1field) {
-              next1field.classList.add('dark-reserved');
-            }
-            if(next2field) {
-              next2field.classList.add('dark-reserved');
-            }
           } else {
-            element.style.position = 'inherit';
-            document.querySelector('#left .ships .three-ships').append(element);
-
+            shipToBack(element);
             return;
           }
           if (numberOfTd > 1) {
@@ -203,21 +225,28 @@ function dragNDropShip() {
             next3field.classList.remove('dark');
           }
 
+          if(field.classList.contains('dark-reserved') ||
+              next1field.classList.contains('dark-reserved') ||
+              next2field.classList.contains('dark-reserved') ||
+              next3field.classList.contains('dark-reserved')) {
+              shipToBack(element);
+              return;
+          }
+
+          if(next1field) {
+            next1field.classList.add('dark-reserved');
+          }
+          if(next2field) {
+            next2field.classList.add('dark-reserved');
+          }
+          if(next3field) {
+            next3field.classList.add('dark-reserved');
+          }
+
           if (numberOfTr < 8) {
             element.style.top = hField + 2.5 + 'px';
-            if(next1field) {
-              next1field.classList.add('dark-reserved');
-            }
-            if(next2field) {
-              next2field.classList.add('dark-reserved');
-            }
-            if(next3field) {
-              next3field.classList.add('dark-reserved');
-            }
           } else {
-            element.style.position = 'inherit';
-            document.querySelector('#left .ships').append(element);
-
+            shipToBack(element);
             return;
           }
           if (numberOfTd > 1) {
@@ -519,6 +548,19 @@ function checkShipOnField(coords) {
   window.scrollTo(scrollX, scrollY);
 
    return (elem.tagName.toLowerCase() == 'img');
+}
+
+function shipToBack(ship) {
+  ship.style.position = 'inherit';
+  if (ship.classList.contains('ship-one')) {
+    document.querySelector('#left .ships .one-ships').append(ship);
+  } else if(ship.classList.contains('ship-two')) {
+    document.querySelector('#left .ships .two-ships').append(ship);
+  } else if(ship.classList.contains('ship-three')) {
+    document.querySelector('#left .ships .three-ships').append(ship);
+  } else if(ship.classList.contains('ship-four')) {
+    document.querySelector('#left .ships').append(ship);
+  }
 }
 
 let allShips = document.querySelectorAll('.a-ship');
